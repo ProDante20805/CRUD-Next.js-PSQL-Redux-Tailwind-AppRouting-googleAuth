@@ -26,10 +26,9 @@ export async function POST(req: NextRequest) {
 
     // Generate a JWT for the session
     const token = jwt.sign({ id: user.id, email: user.email, password }, process.env.JWT_SECRET!, { expiresIn: '1m' });
-    const refreshToken = jwt.sign({ id: user.id, email: user.email, password }, process.env.JWT_SECRET!, { expiresIn: '1d' });
 
 
-    return NextResponse.json({ token, refreshToken }, { status: 200 });
+    return NextResponse.json({ token }, { status: 200 });
   } catch (error) {
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }

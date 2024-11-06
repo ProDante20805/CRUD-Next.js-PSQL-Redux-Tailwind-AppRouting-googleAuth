@@ -39,7 +39,6 @@ const TaskComponent = () => {
       signOut()
     } else {
       localStorage.removeItem('token');
-      localStorage.removeItem('refreshToken');
       router.push("/auth/login");
     }
   }

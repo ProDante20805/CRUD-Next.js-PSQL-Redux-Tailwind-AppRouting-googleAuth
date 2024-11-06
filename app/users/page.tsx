@@ -34,7 +34,6 @@ const UserComponent = () => {
 
   const logout = async () => {
     localStorage.removeItem('token');
-    localStorage.removeItem('refreshToken');
     router.push("/auth/login");
   }
 

@@ -11,7 +11,7 @@ const Notification: FC<Props> = ({message, setMessage}) => {
   useEffect(() => {
     const timer = setTimeout(() => {
         setMessage("")
-    }, 3000);
+    }, 2000);
     return () => clearTimeout(timer);
   }, [setMessage]);
 
