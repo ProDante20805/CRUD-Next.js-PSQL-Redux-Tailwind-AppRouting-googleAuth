@@ -6,24 +6,27 @@ import axios from '../../../lib/axios';
 import Notification from "../components/Notification";
 import LoginButton from "../components/LoginButton";
 import loginValidation from "../../../validation/loginValidation";
+import { useDispatch, useSelector } from "react-redux";
+import { setMessage } from '../../../store/authSlice';
+import { RootState } from '../../../store';
 
 const SignIn: React.FC = () => {
   const router = useRouter();
+  const dispatch = useDispatch();
+  const passwordInputRef = useRef<HTMLInputElement>(null);
 
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
-  const [message, setMessage] = useState<string>("");
   const [error, setError] = useState({ email: '', password: ''});
-  const passwordInputRef = useRef<HTMLInputElement>(null);
- 
+
+  const { message } = useSelector((state: RootState) => state.auth);
+
   useEffect(() => {
-    const refreshToken = localStorage.getItem('refreshToken'); // or use props.token if passed
-    if(refreshToken) {
-      router.push('/tasks')
-    }
-  }, []); // Depend on router to ensure effect runs again if router updates
-
-
+    setTimeout(() => {
+      dispatch(setMessage(""));
+    }, 2500);
+  }, [message]);
+ 
   const handleSubmit = async () => {
     const checkInput = loginValidation(email, password);
     setError(checkInput);
@@ -36,16 +39,16 @@ const SignIn: React.FC = () => {
         const data = await response.data;
         // Save token in localStorage or use context to manage session
         localStorage.setItem("token", data.token);
-        setMessage("Successfully login");
+        dispatch(setMessage("Successfully login"));
         setTimeout(() => {
           router.push("/tasks");
         }, 2500);
       } catch (error: any) {
         if (axios.isAxiosError(error) && error.response) {
-          setMessage(error.response.data.error || "An error occurred while signing up.");
+          dispatch(setMessage(error.response.data.error || "An error occurred while signing up."));
         } else {
           // Non Axios errors
-          setMessage("Unexpected error: " + error.message);
+          dispatch(setMessage("Unexpected error: " + error.message));
           console.error("Unexpected error:", error);
         }
       }
@@ -100,12 +103,8 @@ const SignIn: React.FC = () => {
 
   return (
     <div className="mt-20">
-      {
-        message ? 
-          <Notification message={message} setMessage={setMessage} /> 
-        : 
-        ""
-      }
+      <Notification /> 
+
       <div className="grid gap-2 justify-center">
         <input
           type="email"

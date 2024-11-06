@@ -1,19 +1,16 @@
 "use client";
 import { useState, Dispatch, SetStateAction, useEffect, FC } from 'react';
+import { useDispatch, useSelector } from "react-redux";
+import { setMessage } from '../../../store/authSlice';
+import { RootState } from '../../../store';
 
-interface Props {
-    message: string;
-    setMessage: Dispatch<SetStateAction<string>>;
-}
 
-const Notification: FC<Props> = ({message, setMessage}) => {
-  
-  useEffect(() => {
-    const timer = setTimeout(() => {
-        setMessage("")
-    }, 2000);
-    return () => clearTimeout(timer);
-  }, [setMessage]);
+const Notification: React.FC = () => {
+  const { message } = useSelector((state: RootState) => state.auth);
+
+  if(!message) {
+    return null;
+  }
 
   return (
     <div className="toast toast-top toast-center">

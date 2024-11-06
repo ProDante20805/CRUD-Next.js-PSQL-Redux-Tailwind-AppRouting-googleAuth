@@ -1,22 +1,33 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useRouter } from  "next/navigation";
 import axios from '../../../lib/axios';
 import Notification from "../components/Notification";
 import registerValidation from "../../../validation/registerValidation";
+import { useDispatch, useSelector } from "react-redux";
+import { setMessage } from '../../../store/authSlice';
+import { RootState } from '../../../store';
 
 const SignUp: React.FC = () => {
   const router = useRouter();
+  const dispatch = useDispatch();
 
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [password2, setPassword2] = useState<string>("");
-  const [message, setMessage] = useState<string>("");
   const [error, setError] = useState({ email: '', password: '', password2: ''});
+
+  const { message } = useSelector((state: RootState) => state.auth);
 
   const password1InputRef = useRef<HTMLInputElement>(null);
   const password2InputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    setTimeout(() => {
+      dispatch(setMessage(""));
+    }, 2500);
+  }, [message]);
 
   const handleSubmit = async () => {
     const checkInput = registerValidation(email, password, password2);
@@ -25,17 +36,17 @@ const SignUp: React.FC = () => {
       try {
         const response = await axios.post("/api/auth/signup", { email, password });
         const data = await response.data;
-        setMessage("Successfully registered!");
+        dispatch(setMessage("Successfully registered!"));
         setTimeout(() => {
           router.push("/auth/login");
         }, 2500);
         
       } catch (error: any) {
         if (axios.isAxiosError(error) && error.response) {
-          setMessage(error.response.data.error || "An error occurred while signing up.");
+          dispatch(setMessage(error.response.data.error || "An error occurred while signing up."));
         } else {
           // Non Axios errors
-          setMessage("Unexpected error: " + error.message);
+          dispatch(setMessage("Unexpected error: " + error.message));
           console.error("Unexpected error:", error);
         }
       }
@@ -105,12 +116,7 @@ const SignUp: React.FC = () => {
 
   return (
     <div className="mt-20">
-      {
-        message ? 
-          <Notification message={message} setMessage={setMessage} /> 
-        : 
-          ""
-      }
+      <Notification />
       <div className="grid gap-2 justify-center">
         <input
           type="email"
